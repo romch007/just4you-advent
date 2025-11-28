@@ -1,9 +1,8 @@
 from datetime import datetime, timezone, timedelta
+from flask import current_app
 import jwt
-import os
 
 JWT_EXPIRATION_WEEKS = 13
-SECRET = os.getenv("SECRET_KEY", "ForGodSakeProvideASecret")
 
 
 def generate_token(user_id, username, is_admin):
@@ -14,5 +13,5 @@ def generate_token(user_id, username, is_admin):
         "exp": datetime.now(timezone.utc) + timedelta(weeks=JWT_EXPIRATION_WEEKS),
         "iat": datetime.now(timezone.utc),
     }
-    token = jwt.encode(payload, SECRET, algorithm="HS256")
+    token = jwt.encode(payload, current_app.config["SECRET"], algorithm="HS256")
     return token
