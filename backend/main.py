@@ -8,17 +8,19 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from models import Base, User
 from routes.auth import auth_bp
+from routes.calendar import calendar_bp
 
 app = Flask(__name__)
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(calendar_bp)
 
 # Configuration
 app.config["SECRET"] = os.getenv("SECRET", "ForGodSakeProvideASecret")
 app.config["DATABASE_URL"] = os.getenv("DATABASE_URL", "sqlite:///advent_calendar.db")
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads/calendar_images")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = os.getenv("UPLOAD_FOLDER", "uploads")
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 # Initialize Argon2 password hasher
 ph = PasswordHasher()
