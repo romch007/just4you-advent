@@ -1,5 +1,6 @@
 sqlalchemy
 Flask
+flask-cors
 argon2-cffi
 pyjwt
 black

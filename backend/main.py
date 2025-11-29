@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_cors import CORS
 from argon2 import PasswordHasher
 
 from sqlalchemy import create_engine
@@ -11,6 +12,7 @@ from routes.auth import auth_bp
 from routes.calendar import calendar_bp
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:8080", "https://advent.logan-lucas.com"])
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(calendar_bp)

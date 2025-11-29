@@ -39,7 +39,7 @@ const Index = () => {
             size="lg"
             className="mt-8 bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
-            <Link to="/login">
+            <Link to="/calendar">
               Open Your Calendar
             </Link>
           </Button>

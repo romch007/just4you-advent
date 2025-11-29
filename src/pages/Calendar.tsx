@@ -68,7 +68,7 @@ const getImageForDay = (day: number) => {
 };
 
 const Calendar = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [openedToday, setOpenedToday] = useState(0);
 
@@ -76,10 +76,12 @@ const Calendar = () => {
   const remaining = DAILY_LIMIT - openedToday;
 
   useEffect(() => {
-    if (!user) {
+    console.log(isLoading);
+    console.log(user);
+    if (!isLoading && !user) {
       navigate('/login');
     }
-  }, [user, navigate]);
+  }, [user, navigate, isLoading]);
 
   const handleBoxOpen = () => {
     setOpenedToday(prev => prev + 1);
@@ -99,9 +101,9 @@ const Calendar = () => {
         </h1>
         <p className="text-muted-foreground mt-1 text-sm md:text-base">
           {canOpenMore ? (
-            <>You can open <span className="text-christmas-gold font-semibold">{remaining}</span> more box{remaining !== 1 ? 'es' : ''} today, {user.username}! 🎁</>
+            <>You can open <span className="text-christmas-gold font-semibold">{remaining}</span> more box{remaining !== 1 ? 'es' : ''} today, {user.name}! 🎁</>
           ) : (
-            <>Come back tomorrow for more surprises, {user.username}! 🌟</>
+            <>Come back tomorrow for more surprises, {user.name}! 🌟</>
           )}
         </p>
       </div>
