@@ -248,3 +248,41 @@ def get_image(day):
 
     finally:
         session.close()
+
+
+@calendar_bp.route("/my-calendar/open/<int:day>", methods=["GET"])
+@token_required
+def open_calendar_day(day):
+    if day < 1 or day > 24:
+        return jsonify({"error": "Day must be between 1 and 24"}), 400
+
+    Session = current_app.config["DB_SESSION"]
+
+    session = Session()
+    try:
+        user = session.query(User).filter_by(id=request.current_user["user_id"]).first()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        calendar_day = (
+            session.query(CalendarDay)
+            .filter_by(calendar_id=user.calendar_id, day=day)
+            .first()
+        )
+
+        if not calendar_day:
+            return jsonify({"error": f"Day {day} not found in calendar"}), 404
+
+        if calendar_day.is_open:
+            return jsonify({"error": f"Day {day} already opened"}), 409
+
+        # TODO: check if date corresponds
+
+        calendar_day.is_open = True
+        session.commit()
+
+        return jsonify({"message": f"Successfully opened Calendar's day {day}"}), 200
+
+    finally:
+        session.close()

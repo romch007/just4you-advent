@@ -73,6 +73,28 @@ Get the calendar associated with the authenticated user.
 
 ---
 
+## **GET `/my-calendar/open/<day>`**
+
+### Description
+
+Open the specified day in the advent calendar.
+
+### Request
+
+| Field  | Value                     |
+| ------ | ------------------------- |
+| Method | `GET`                     |
+| URL    | `/my-calendar/open/<day>` |
+| Auth   | Bearer token required     |
+
+### Response
+
+| Returns         |
+| --------------- |
+| Success message |
+
+---
+
 ## **GET `/images/<day>`**
 
 ### Description
