@@ -9,11 +9,6 @@ from models import User, Calendar
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/users")
-def list_users():
-    return "Here are the users"
-
-
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
