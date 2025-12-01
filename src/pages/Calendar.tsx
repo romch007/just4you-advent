@@ -5,10 +5,7 @@ import Navbar from "@/components/Navbar";
 import Snowfall from "@/components/Snowfall";
 import AdventBox from "@/components/AdventBox";
 import { useQuery } from "@tanstack/react-query";
-import { getMyCalendar, BACKEND_URL } from "@/lib/api";
-
-// Mock daily limit - replace with backend later
-const DAILY_LIMIT = 3;
+import { getMyCalendar } from "@/lib/api";
 
 // Fixed positions for each box (percentage-based, carefully spaced to avoid overlap)
 const boxPositions = [
@@ -38,13 +35,19 @@ const boxPositions = [
     { top: "65%", left: "83%" },
 ];
 
-// Placeholder images - these can be replaced with actual gift images
-const getImageForDay = (day: number) => BACKEND_URL + "/images/" + day;
+const checkDay = (day: number): boolean => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const target = new Date(2025, 11, day);
+    target.setHours(0, 0, 0, 0);
+
+    return target <= now;
+};
 
 const Calendar = () => {
     const { user, isLoading: authLoading } = useAuth();
+    const [remaining, setRemaining] = useState(0);
     const navigate = useNavigate();
-    const [openedToday, setOpenedToday] = useState(0);
 
     const { data, isSuccess } = useQuery({
         queryKey: ["my-calendar", user?.token],
@@ -56,18 +59,20 @@ const Calendar = () => {
         enabled: !!user,
     });
 
-    const canOpenMore = openedToday < DAILY_LIMIT;
-    const remaining = DAILY_LIMIT - openedToday;
+    useEffect(() => {
+        if (isSuccess) {
+            setRemaining(
+                data.days.filter((calendarDay) => !calendarDay.is_open && checkDay(calendarDay.day))
+                    .length,
+            );
+        }
+    }, [data]);
 
     useEffect(() => {
         if (!authLoading && !user) {
             navigate("/login");
         }
     }, [user, navigate, authLoading]);
-
-    const handleBoxOpen = () => {
-        setOpenedToday((prev) => prev + 1);
-    };
 
     if (!user) return null;
 
@@ -82,7 +87,7 @@ const Calendar = () => {
                     Your Advent Calendar
                 </h1>
                 <p className="text-muted-foreground mt-1 text-sm md:text-base">
-                    {canOpenMore ? (
+                    {remaining > 0 ? (
                         <>
                             You can open{" "}
                             <span className="text-christmas-gold font-semibold">{remaining}</span>{" "}
@@ -102,8 +107,8 @@ const Calendar = () => {
                         day={day}
                         style={boxPositions[day - 1]}
                         isDbOpen={isSuccess && data.days[day - 1].is_open}
-                        canOpen={canOpenMore}
-                        onOpen={handleBoxOpen}
+                        canOpen={checkDay(day)}
+                        onOpen={() => setRemaining((prev) => prev - 1)}
                     />
                 ))}
             </div>
