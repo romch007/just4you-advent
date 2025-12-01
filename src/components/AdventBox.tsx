@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { openCalendarDay } from "@/lib/api";
+import { getImageOfDay, openCalendarDay } from "@/lib/api";
 
 interface AdventBoxProps {
     day: number;
-    imageUrl: string;
     style: React.CSSProperties;
     isDbOpen: boolean;
     canOpen: boolean;
     onOpen: () => void;
 }
 
-const AdventBox = ({ day, imageUrl, style, isDbOpen, canOpen, onOpen }: AdventBoxProps) => {
+const AdventBox = ({ day, style, isDbOpen, canOpen, onOpen }: AdventBoxProps) => {
     const { user } = useAuth();
     const [isRequestEnabled, setRequestEnabled] = useState(false);
     const [isRequestProcessing, setIsRequestProcessing] = useState(false);
@@ -27,6 +26,16 @@ const AdventBox = ({ day, imageUrl, style, isDbOpen, canOpen, onOpen }: AdventBo
             return openCalendarDay(user.token, day);
         },
         enabled: isRequestEnabled && !!user,
+    });
+
+    const { data: imgBlob, isSuccess: isImgQuerySuccess } = useQuery({
+        queryKey: [`my-calendar_img_${user?.name}_${day}`, user?.token],
+        queryFn: async () => {
+            if (!user) throw new Error("No user");
+
+            return getImageOfDay(user.token, day);
+        },
+        enabled: (isOpen || isDbOpen) && !!user,
     });
 
     useEffect(() => {
@@ -84,7 +93,9 @@ const AdventBox = ({ day, imageUrl, style, isDbOpen, canOpen, onOpen }: AdventBo
                     {/* Content behind the door */}
                     <div className="advent-box-content">
                         <img
-                            src={imageUrl}
+                            src={
+                                isImgQuerySuccess ? URL.createObjectURL(imgBlob) : "placeholderimg"
+                            }
                             alt={`Day ${day} surprise`}
                             className="w-full h-full object-cover rounded-md"
                         />

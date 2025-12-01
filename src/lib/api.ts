@@ -24,6 +24,19 @@ export async function getMyCalendar(token: string): Promise<Calendar> {
     return response.json();
 }
 
+export async function getImageOfDay(token: string, day: number): Promise<Blob> {
+    const response = await fetch(BACKEND_URL + "/images/" + day, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) throw new Error(`Error while getting image of day ${day}`);
+
+    return response.blob();
+}
+
 export async function openCalendarDay(token: string, day: number): Promise<boolean> {
     const response = await fetch(BACKEND_URL + "/my-calendar/open/" + day, {
         method: "GET",

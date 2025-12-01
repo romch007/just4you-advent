@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Snowfall from "@/components/Snowfall";
 import AdventBox from "@/components/AdventBox";
 import { useQuery } from "@tanstack/react-query";
-import { getMyCalendar } from "@/lib/api";
+import { getMyCalendar, BACKEND_URL } from "@/lib/api";
 
 // Mock daily limit - replace with backend later
 const DAILY_LIMIT = 3;
@@ -39,35 +39,7 @@ const boxPositions = [
 ];
 
 // Placeholder images - these can be replaced with actual gift images
-const getImageForDay = (day: number) => {
-    const images = [
-        "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1543934638-bd2e138430c4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1514923995763-768e52f5af87?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1543934638-bd2e138430c4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1514923995763-768e52f5af87?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1545048702-79362596cdc9?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1543934638-bd2e138430c4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=200&h=200&fit=crop",
-        "https://images.unsplash.com/photo-1544816155-12df9643f363?w=200&h=200&fit=crop",
-    ];
-    return images[(day - 1) % images.length];
-};
+const getImageForDay = (day: number) => BACKEND_URL + "/images/" + day;
 
 const Calendar = () => {
     const { user, isLoading: authLoading } = useAuth();
@@ -128,7 +100,6 @@ const Calendar = () => {
                     <AdventBox
                         key={day}
                         day={day}
-                        imageUrl={getImageForDay(day)}
                         style={boxPositions[day - 1]}
                         isDbOpen={isSuccess && data.days[day - 1].is_open}
                         canOpen={canOpenMore}
