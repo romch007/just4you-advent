@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { openCalendarDay } from '@/lib/api';
 
 interface AdventBoxProps {
   day: number;
@@ -10,8 +13,22 @@ interface AdventBoxProps {
 }
 
 const AdventBox = ({ day, imageUrl, style, isDbOpen, canOpen, onOpen }: AdventBoxProps) => {
+  const { user } = useAuth();
+  const [isRequestEnabled, setRequestEnabled] = useState(false);
+  const [isRequestProcessing, setIsRequestProcessing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
+
+  const { isSuccess } = useQuery({
+      queryKey: [`my-calendar_open_${user?.name}_${day}`, user?.token],
+      queryFn: async () => {
+          if (!user)
+              throw new Error("No user");
+
+          return openCalendarDay(user.token, day);
+      },
+      enabled: isRequestEnabled && !!user,
+  });
 
   useEffect(() => {
       if (isDbOpen)
@@ -19,17 +36,34 @@ const AdventBox = ({ day, imageUrl, style, isDbOpen, canOpen, onOpen }: AdventBo
   }, [isDbOpen]);
 
   const handleClick = () => {
-    if (!isOpen && canOpen) {
-      setIsRevealing(true);
-      setTimeout(() => {
-        setIsOpen(true);
-        onOpen();
-      }, 300);
-      setTimeout(() => {
-        setIsRevealing(false);
-      }, 1500);
+    if (!isOpen && canOpen && !isRequestProcessing) {
+        setIsRequestProcessing(true);
+      setRequestEnabled(true);
     }
   };
+
+  useEffect(() => {
+      let openTimeout: NodeJS.Timeout;
+      let stopRevealingTimeout: NodeJS.Timeout;
+
+      if (isSuccess) {
+          setRequestEnabled(false);
+          setIsRevealing(true);
+          openTimeout = setTimeout(() => {
+            setIsOpen(true);
+            onOpen();
+          }, 300);
+          stopRevealingTimeout = setTimeout(() => {
+              setIsRequestProcessing(false);
+            setIsRevealing(false);
+          }, 1500);
+      }
+
+      return () => {
+          clearTimeout(openTimeout);
+          clearTimeout(stopRevealingTimeout);
+      };
+  }, [isSuccess]);
 
   return (
     <>
