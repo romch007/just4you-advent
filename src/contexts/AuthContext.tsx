@@ -25,7 +25,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             try {
-                // TODO: check token expiration
                 setUser(JSON.parse(storedUser));
             } catch (error) {
                 console.error("Failed to parse stored user:", error);

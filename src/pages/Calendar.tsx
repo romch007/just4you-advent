@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Snowfall from "@/components/Snowfall";
 import AdventBox from "@/components/AdventBox";
-import { useQuery } from "@tanstack/react-query";
-import { getMyCalendar } from "@/lib/api";
+import { getMyCalendar, me } from "@/lib/api";
+import { toast } from "sonner";
 
 // Fixed positions for each box (percentage-based, carefully spaced to avoid overlap)
 const boxPositions = [
@@ -45,7 +47,7 @@ const checkDay = (day: number): boolean => {
 };
 
 const Calendar = () => {
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, logout } = useAuth();
     const [remaining, setRemaining] = useState(0);
     const navigate = useNavigate();
 
@@ -58,6 +60,20 @@ const Calendar = () => {
         },
         enabled: !!user,
     });
+
+    // This checks token expiration on every page load
+    useEffect(() => {
+        const checkTokenExpiration = async () => {
+            try {
+                await me(user.token);
+            } catch (error) {
+                toast.error("Your token has expired, please log in again");
+                logout();
+            }
+        };
+
+        if (user) checkTokenExpiration();
+    }, [user]);
 
     useEffect(() => {
         if (isSuccess) {

@@ -1,5 +1,13 @@
 export const BACKEND_URL = "http://localhost:5000";
 
+export type User = {
+    username: string;
+    name: string;
+    is_admin: boolean;
+    id: number;
+    calendar_id: number;
+};
+
 export type CalendarDay = {
     day: number;
     is_open: boolean;
@@ -60,4 +68,27 @@ export async function openCalendarDay(token: string, day: number): Promise<boole
     }
 
     return response.ok;
+}
+
+export async function me(token: string): Promise<User> {
+    const response = await fetch(BACKEND_URL + "/me", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        switch (response.status) {
+            case 401:
+                throw new Error("Token has expired");
+            case 404:
+                // This should never happen
+                throw new Error("User deleted or day not in calendar");
+            default:
+                throw new Error("Unknown error while getting user info");
+        }
+    }
+
+    return response.json();
 }
