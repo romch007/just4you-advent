@@ -7,7 +7,7 @@ from datetime import datetime
 from middlewares import admin_required, token_required
 from models import Calendar, CalendarDay, User
 
-calendar_bp = Blueprint("calendar", __name__)
+calendar_bp = Blueprint("calendar", __name__, url_prefix="/api")
 
 
 @calendar_bp.route("/calendars", methods=["POST"])

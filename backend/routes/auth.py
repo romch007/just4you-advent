@@ -6,7 +6,7 @@ from jwt_utils import generate_token
 from middlewares import admin_required, token_required
 from models import User, Calendar
 
-auth_bp = Blueprint("auth", __name__)
+auth_bp = Blueprint("auth", __name__, url_prefix="/api")
 
 
 @auth_bp.route("/login", methods=["POST"])
