@@ -70,6 +70,9 @@ def bootstrap_admin():
         session.close()
 
 
+bootstrap_admin()
+
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     """Remove database session at the end of the request."""
@@ -77,8 +80,5 @@ def shutdown_session(exception=None):
 
 
 if __name__ == "__main__":
-    # Bootstrap admin user on startup
-    bootstrap_admin()
-
     # Run the Flask app
     app.run(debug=True, host="0.0.0.0", port=5000)
